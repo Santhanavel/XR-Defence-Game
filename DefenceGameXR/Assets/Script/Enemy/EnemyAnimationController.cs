@@ -16,7 +16,7 @@ public class EnemyAnimationController : MonoBehaviour
     }
 
     [SerializeField] private Animator anim;
-    [SerializeField] private EnemyAnimType currentAnim = EnemyAnimType.Idle;
+    [HideInInspector] public EnemyAnimType currentAnim = EnemyAnimType.Idle;
 
 
     public void Play(EnemyAnimType type)

@@ -13,9 +13,6 @@ public class EnemyController : MonoBehaviour
     public float rotateSpeed = 6f;         // turning speed
     public float stopDistance = 1.5f;      // distance before stopping
 
-    [Header("Attack")]
-    public float attackCooldown = 1.5f;
-    public float attackTimer;
     private bool isDead = false;
 
     void Start()
@@ -33,7 +30,6 @@ public class EnemyController : MonoBehaviour
         if (isDead || target == null)
             return;
 
-        attackTimer -= Time.deltaTime;
 
         float distance = Vector3.Distance(transform.position, target.position);
 
@@ -68,20 +64,9 @@ public class EnemyController : MonoBehaviour
 
     void AttackTarget()
     {
-        // If attack not ready → idle or small movement
-        if (attackTimer > 0)
-        {
-            animPlayer.Play(EnemyAnimType.Idle);
-            return;
-        }
-
-        attackTimer = attackCooldown;
-
         // Play attack animation
         animPlayer.Play(EnemyAnimType.Attack01);
 
-        // You can apply damage here
-        // target.GetComponent<PlayerHealth>()?.TakeDamage(10);
     }
 
     public void Die()
