@@ -2,15 +2,13 @@ using UnityEngine;
 
 public class EnemyWeapon : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    [SerializeField] private Transform stoneSpawnPos;
+    [SerializeField] private ObjectPoolManager spawner;
+    [SerializeField] private string weaponName;
 
-    // Update is called once per frame
-    void Update()
+
+    public void Attack()
     {
-        
+
     }
 }
