@@ -180,10 +180,13 @@ MonoBehaviour:
   objectsToPool:
   - Name: GreenStone
     obj: {fileID: 5120474985019051930, guid: 1cb97aedc8b5f1042b2373e5ec197541, type: 3}
-    poolCount: 50
+    poolCount: 25
   - Name: GreenExplosion
     obj: {fileID: 5092816581447787972, guid: 2e013af76276b22478ec4d76f4947da4, type: 3}
-    poolCount: 50
+    poolCount: 25
+  - Name: Death
+    obj: {fileID: 4397334591890123670, guid: 1d23b1e1532f62a4fa986511ffd5e9e0, type: 3}
+    poolCount: 25
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
