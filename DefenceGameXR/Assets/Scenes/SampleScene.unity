@@ -187,6 +187,11 @@ MonoBehaviour:
   - Name: Death
     obj: {fileID: 4397334591890123670, guid: 1d23b1e1532f62a4fa986511ffd5e9e0, type: 3}
     poolCount: 25
+--- !u!4 &260021134 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5236448926018381213, guid: 3b297218a5f80a848a322642b81ab9ea, type: 3}
+  m_PrefabInstance: {fileID: 1828061657}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
@@ -694,8 +699,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e95be89974158a14f852e919171e6c17, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  animPlayer: {fileID: 503582490}
-  target: {fileID: 0}
   moveSpeed: 1
   rotateSpeed: 1
   stopDistance: 10
@@ -736,7 +739,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyWeapon
   stoneSpawnPos: {fileID: 1926294100}
   spawner: {fileID: 176149533}
-  weaponName: 
+  weaponName: GreenStone
+  attackDelay: 2
+  attackCount: 1
+  destroyDelay: 2
 --- !u!114 &503582495
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -782,11 +788,6 @@ Transform:
   - {fileID: 1541129957}
   m_Father: {fileID: 1130586843}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!4 &607668091 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1730386433856504380, guid: 3b297218a5f80a848a322642b81ab9ea, type: 3}
-  m_PrefabInstance: {fileID: 1828061657}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &814006052
 GameObject:
   m_ObjectHideFlags: 0
@@ -1397,6 +1398,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: miniHouse_FBX
       objectReference: {fileID: 0}
+    - target: {fileID: 6274478357893901074, guid: a3aacf53284d1f740b8e3ac60e530275, type: 3}
+      propertyPath: m_TagString
+      value: Untagged
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -1417,9 +1422,10 @@ GameObject:
   m_Component:
   - component: {fileID: 1249764112}
   - component: {fileID: 1249764111}
+  - component: {fileID: 1249764113}
   m_Layer: 0
   m_Name: House
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1463,6 +1469,33 @@ Transform:
   - {fileID: 1145262176}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &1249764113
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1249764110}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!1 &1417645376
 GameObject:
   m_ObjectHideFlags: 0
@@ -1817,8 +1850,8 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 1730386433856504380, guid: 3b297218a5f80a848a322642b81ab9ea, type: 3}
-      insertIndex: -1
+    - targetCorrespondingSourceObject: {fileID: 5236448926018381213, guid: 3b297218a5f80a848a322642b81ab9ea, type: 3}
+      insertIndex: 0
       addedObject: {fileID: 1926294100}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 7679210035596594487, guid: 3b297218a5f80a848a322642b81ab9ea, type: 3}
@@ -1864,12 +1897,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1926294099}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.00051, z: -0.00102}
+  m_LocalRotation: {x: 0.13262469, y: -0.10477731, z: 0.7031938, w: -0.6906163}
+  m_LocalPosition: {x: 0.0035195532, y: 0, z: 0.0048719263}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 607668091}
+  m_Father: {fileID: 260021134}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

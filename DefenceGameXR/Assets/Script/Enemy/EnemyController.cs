@@ -5,12 +5,16 @@ using static EnemyAnimationController;
 public class EnemyController : MonoBehaviour
 {
     [Header("References")]
-    public EnemyAnimationController animPlayer;  // Custom animation system
-    public Transform target;
+    private EnemyAnimationController animPlayer;  // Custom animation system
+    private EnemyWeapon weaponController;
+    private Transform target;
 
     [Header("Movement")]
+    [Range(0f, 10f)]
     public float moveSpeed = 2f;           // walking speed
+    [Range(0f, 10f)]
     public float rotateSpeed = 6f;         // turning speed
+    [Range(0f, 10f)]
     public float stopDistance = 1.5f;      // distance before stopping
 
     private bool isDead = false;
@@ -23,6 +27,10 @@ public class EnemyController : MonoBehaviour
             if (p != null)
                 target = p.transform;
         }
+        if(animPlayer  == null)
+            animPlayer = GetComponent<EnemyAnimationController>();
+        if (weaponController == null)
+            weaponController = GetComponent<EnemyWeapon>();
     }
 
     void Update()
@@ -66,6 +74,7 @@ public class EnemyController : MonoBehaviour
     {
         // Play attack animation
         animPlayer.Play(EnemyAnimType.Attack01);
+        weaponController.Attack();
 
     }
 

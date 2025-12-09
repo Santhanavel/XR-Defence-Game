@@ -29,72 +29,115 @@ This shader has NOT been tested on any other PC configuration except the followi
 ____________________________________________________________________________________________________________________________________________
 */
 
-Shader "Ultimate 10+ Shaders/Dissolve"
+Shader "Ultimate 10+ Shaders/URP_Dissolve"
 {
     Properties
     {
-        _Color ("Color", Color) = (1,1,1,1)
-        _MainTex ("Albedo (RGB)", 2D) = "white" {}
-        _NoiseTex ("Noise", 2D) = "white" {}
+        _BaseMap("Albedo", 2D) = "white" {}
+        _BaseColor("Color", Color) = (1,1,1,1)
 
-        _Cutoff ("Cut off", Range(0, 1)) = 0.25
-        _EdgeWidth ("Edge Width", Range(0, 1)) = 0.05
-        [HDR] _EdgeColor ("Edge Color", Color) = (1,1,1,1)
+        _NoiseTex("Noise Texture", 2D) = "white" {}
         
+        _Cutoff("Dissolve Cutoff", Range(0,1)) = 0.25
+        _EdgeWidth("Edge Width", Range(0,1)) = 0.05
+        [HDR] _EdgeColor("Edge Color", Color) = (1,1,1,1)
+
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2
     }
+
     SubShader
     {
-        Tags { "RenderType"="Geometry" "Queue"="Transparent" }
-        LOD 200
-        Cull [_Cull]
-
-        CGPROGRAM
-        // Physically based Standard lighting model, and enable shadows on all light types
-        #pragma surface surf Standard addshadow fullforwardshadows
-
-        #ifndef SHADER_API_D3D11
-            #pragma target 3.0
-        #else
-            #pragma target 4.0
-        #endif
-
-        sampler2D _MainTex;
-        sampler2D _NoiseTex;
-
-        half _Cutoff;
-        half _EdgeWidth;
-
-        fixed4 _Color;
-        fixed4 _EdgeColor;
-
-        struct Input
-        {
-            float2 uv_MainTex;
-            float2 uv_NoiseTex;
-        };
-
-        // Add instancing support for this shader. You need to check 'Enable Instancing' on materials that use the shader.
-        // See https://docs.unity3d.com/Manual/GPUInstancing.html for more information about instancing.
-        // #pragma instancing_options assumeuniformscaling
-        UNITY_INSTANCING_BUFFER_START(Props)
-            // put more per-instance properties here
-        UNITY_INSTANCING_BUFFER_END(Props)
-
-        fixed4 noisePixel, pixel;
-        half cutoff;
-        void surf (Input IN, inout SurfaceOutputStandard o)
-        {
-            pixel = tex2D (_MainTex, IN.uv_MainTex) * _Color;
-
-            o.Albedo = pixel.rgb;
-
-            noisePixel = tex2D (_NoiseTex, IN.uv_NoiseTex);
-
-            clip(noisePixel.r >= _Cutoff ? 1 : -1);
-            o.Emission = noisePixel.r >= (_Cutoff * (_EdgeWidth + 1.0)) ? 0 : _EdgeColor;
+        Tags{
+            "RenderType"="Transparent"
+            "Queue"="Transparent"
+            "RenderPipeline"="UniversalPipeline"
         }
-        ENDCG
+
+        Cull [_Cull]
+        Blend SrcAlpha OneMinusSrcAlpha
+
+        Pass
+        {
+            Name "ForwardLit"
+            Tags{"LightMode"="UniversalForward"}
+
+            HLSLPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
+
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS
+            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile _ _SHADOWS_SOFT
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+
+            TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
+            TEXTURE2D(_NoiseTex); SAMPLER(sampler_NoiseTex);
+
+            float4 _BaseColor;
+            float _Cutoff;
+            float _EdgeWidth;
+            float4 _EdgeColor;
+
+            struct Attributes
+            {
+                float4 positionOS : POSITION;
+                float2 uv : TEXCOORD0;
+                float2 uv2 : TEXCOORD1;
+            };
+
+            struct Varyings
+            {
+                float4 positionCS : SV_POSITION;
+                float2 uv : TEXCOORD0;
+                float2 uv2 : TEXCOORD1;
+                float3 worldNormal : TEXCOORD2;
+                float3 worldPos : TEXCOORD3;
+            };
+
+            Varyings vert(Attributes IN)
+            {
+                Varyings OUT;
+                OUT.positionCS = TransformObjectToHClip(IN.positionOS.xyz);
+                OUT.uv = IN.uv;
+                OUT.uv2 = IN.uv2;
+                OUT.worldPos = TransformObjectToWorld(IN.positionOS.xyz);
+
+                float3 normalWS = TransformObjectToWorldNormal(float3(0,0,1));
+                OUT.worldNormal = normalWS;
+
+                return OUT;
+            }
+
+            half4 frag(Varyings IN) : SV_Target
+            {
+                float4 baseCol = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, IN.uv) * _BaseColor;
+                float noiseVal = SAMPLE_TEXTURE2D(_NoiseTex, sampler_NoiseTex, IN.uv2).r;
+
+                // --- DISSOLVE CUT ---
+                if (noiseVal < _Cutoff)
+                {
+                    discard;
+                }
+
+                // --- EDGE EMISSION ---
+                float edgeRange = _Cutoff + _EdgeWidth;
+                float isEdge = step(noiseVal, edgeRange);
+                float3 emission = _EdgeColor.rgb * isEdge;
+
+                // --- LIGHTING ---
+                Light light = GetMainLight();
+                float3 normal = normalize(IN.worldNormal);
+                float NdotL = saturate(dot(normal, light.direction));
+                float3 litColor = baseCol.rgb * (NdotL * light.color);
+
+                return float4(litColor + emission, baseCol.a);
+            }
+            ENDHLSL
+        }
     }
-    FallBack "Diffuse"
+
+    FallBack Off
 }
